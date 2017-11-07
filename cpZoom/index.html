@@ -46,6 +46,7 @@ var pack = d3.pack()
     .size([diameter - margin, diameter - margin])
     .padding(2);
 
+
 d3.json("taxITRDB.json", function(error, root) {
   if (error) throw error;
 
@@ -64,22 +65,35 @@ d3.json("taxITRDB.json", function(error, root) {
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
       .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
+
   var text = g.selectAll("text")
     .data(nodes)
     .enter().append("text")
       .attr("class", "label")
       .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
       .style("display", function(d) { return d.parent === root ? "inline" : "none"; })
-      .text(function(d) { return d.data.name; });
+      //.text(function(d) { return d.data.name; });
+        .text(function(d) {
+              if(d.depth==1){foo=4;}
+              else if(d.depth==2){foo=3;}
+              else if(d.depth==3){foo=2;}
+              else {foo=1;}
+              return d.data.name + " (n=" + d.value/foo + ")"; });
+      // flower v = 1 should be 4
+      // family v = 2 should be 3
+      // genus v = 3 should be 2
+      // genus v = 4 should be 1
 
   var node = g.selectAll("circle,text");
-
+        
+        
   svg
       .style("background", color(-1))
       .on("click", function() { zoom(root); });
 
   zoomTo([root.x, root.y, root.r * 2 + margin]);
 
+        
   function zoom(d) {
     var focus0 = focus; focus = d;
 
